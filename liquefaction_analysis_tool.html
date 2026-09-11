@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Liquefaction Potential Analysis — SPT &amp; CPT (Youd &amp; Idriss 2001)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F4EE;
+  --panel:#FFFFFF;
+  --ink:#1C2530;
+  --ink-soft:#525B66;
+  --line:#D8D3C4;
+  --blue:#28578C;
+  --blue-deep:#1B3A5C;
+  --amber:#9C5B12;
+  --amber-bg:#FBEFDC;
+  --red:#A32424;
+  --red-bg:#FAE3E1;
+  --green:#276B3E;
+  --green-bg:#E4F1E7;
+  --grid:#E7E2D3;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'IBM Plex Sans',sans-serif;
+  font-size:14px;
+  line-height:1.45;
+}
+.mono{font-family:'IBM Plex Mono',monospace;}
+h1,h2,h3,h4{
+  font-family:'Barlow Condensed',sans-serif;
+  font-weight:600;
+  letter-spacing:0.01em;
+  margin:0 0 8px 0;
+  color:var(--blue-deep);
+}
+header.app{
+  background:var(--blue-deep);
+  color:#EFE9DA;
+  padding:18px 22px 16px 22px;
+  border-bottom:4px solid var(--blue);
+}
+header.app h1{
+  color:#F4EFE2;
+  font-size:26px;
+  margin-bottom:2px;
+}
+header.app .sub{
+  font-size:12.5px;
+  color:#B9C6D6;
+  font-family:'IBM Plex Mono',monospace;
+}
+nav.tabs{
+  display:flex;
+  flex-wrap:wrap;
+  gap:2px;
+  background:var(--blue-deep);
+  padding:0 18px;
+  border-bottom:1px solid var(--line);
+}
+nav.tabs button{
+  background:transparent;
+  border:none;
+  color:#C7D2DE;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:15px;
+  font-weight:600;
+  letter-spacing:0.02em;
+  padding:9px 14px 8px 14px;
+  cursor:pointer;
+  border-bottom:3px solid transparent;
+}
+nav.tabs button.active{
+  color:#fff;
+  border-bottom:3px solid #E0A458;
+  background:rgba(255,255,255,0.06);
+}
+main{
+  max-width:1180px;
+  margin:0 auto;
+  padding:20px 20px 60px 20px;
+}
+.panel{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:3px;
+  padding:16px 18px;
+  margin-bottom:16px;
+}
+.panel-title{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  border-bottom:2px solid var(--grid);
+  padding-bottom:6px;
+  margin-bottom:12px;
+}
+.panel-title h2{font-size:19px;margin:0;}
+.panel-title .eq-ref{font-size:11px;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;}
+.grid{display:grid;gap:10px;}
+.grid.cols-4{grid-template-columns:repeat(4,1fr);}
+.grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.grid.cols-2{grid-template-columns:repeat(2,1fr);}
+@media(max-width:760px){.grid.cols-4,.grid.cols-3,.grid.cols-2{grid-template-columns:1fr 1fr;}}
+label{
+  display:block;
+  font-size:11.5px;
+  text-transform:none;
+  color:var(--ink-soft);
+  margin-bottom:3px;
+}
+input, select{
+  width:100%;
+  padding:6px 7px;
+  border:1px solid #C7C0AC;
+  border-radius:2px;
+  background:#FDFCF9;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:13px;
+  color:var(--ink);
+}
+input:focus, select:focus{outline:2px solid var(--blue);outline-offset:0;}
+.field{margin-bottom:2px;}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+button.btn{
+  font-family:'Barlow Condensed',sans-serif;
+  font-weight:600;
+  font-size:14.5px;
+  letter-spacing:0.02em;
+  padding:8px 16px;
+  border-radius:2px;
+  border:1px solid var(--blue-deep);
+  background:var(--blue);
+  color:#fff;
+  cursor:pointer;
+}
+button.btn.secondary{background:#fff;color:var(--blue-deep);}
+button.btn.danger{background:#fff;color:var(--red);border-color:var(--red);}
+button.btn:hover{filter:brightness(1.08);}
+table{border-collapse:collapse;width:100%;font-size:12.5px;}
+table.datatable th, table.datatable td{
+  border:1px solid var(--grid);
+  padding:4px 5px;
+  text-align:right;
+}
+table.datatable th{
+  background:#EFEADA;
+  color:var(--blue-deep);
+  font-family:'IBM Plex Mono',monospace;
+  font-weight:600;
+  font-size:11px;
+  position:sticky;top:0;
+}
+table.datatable td input, table.datatable td select{padding:3px 4px;font-size:12px;border:1px solid #DCD5C4;}
+table.datatable td.rm{text-align:center;cursor:pointer;color:var(--red);font-weight:600;}
+.table-wrap{overflow-x:auto;max-width:100%;}
+tr.liq td{background:var(--red-bg);}
+tr.nonliq td{background:var(--green-bg);}
+.badge{
+  display:inline-block;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  font-weight:600;
+  padding:2px 7px;
+  border-radius:2px;
+}
+.badge.liq{background:var(--red);color:#fff;}
+.badge.nonliq{background:var(--green);color:#fff;}
+.badge.warn{background:var(--amber);color:#fff;}
+.warnbox{
+  background:var(--amber-bg);
+  border-left:3px solid var(--amber);
+  padding:8px 12px;
+  margin:6px 0;
+  font-size:12.5px;
+}
+.warnbox.err{background:var(--red-bg);border-left-color:var(--red);}
+details.calc summary{
+  cursor:pointer;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11.5px;
+  color:var(--blue);
+}
+details.calc{margin:2px 0;}
+.calcbox{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11.5px;
+  background:#F3F0E6;
+  border:1px solid var(--grid);
+  padding:6px 8px;
+  margin-top:4px;
+  white-space:pre-wrap;
+}
+.section{display:none;}
+.section.active{display:block;}
+.small{font-size:11.5px;color:var(--ink-soft);}
+.methnote{font-size:12px;color:var(--ink-soft);border-top:1px dashed var(--line);margin-top:10px;padding-top:8px;}
+.tag-ref{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10.5px;
+  color:#fff;
+  background:var(--blue-deep);
+  padding:1px 5px;
+  border-radius:2px;
+}
+.chart-wrap{display:flex;gap:18px;flex-wrap:wrap;}
+svg.plot{background:#FDFCF9;border:1px solid var(--line);}
+.legend-item{display:inline-flex;align-items:center;gap:5px;margin-right:14px;font-size:11.5px;}
+.swatch{width:11px;height:11px;display:inline-block;border-radius:1px;}
+footer.meth{
+  background:#EFEADA;
+  padding:14px 18px;
+  font-size:12px;
+  color:var(--ink-soft);
+  border-top:2px solid var(--grid);
+}
+</style>
+</head>
+<body>
+
+<header class="app">
+  <h1>Liquefaction Potential Analysis</h1>
+  <div class="sub">SPT &amp; CPT Simplified Procedure — Youd &amp; Idriss (2001), <em>J. Geotech. &amp; Geoenvir. Engrg.</em> 127(4):297–313</div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="project" class="active">Project</button>
+  <button data-tab="eq">Earthquake</button>
+  <button data-tab="spt">SPT Input</button>
+  <button data-tab="cpt">CPT Input</button>
+  <button data-tab="results">Results</button>
+  <button data-tab="graphs">Graphs</button>
+  <button data-tab="methodology">Methodology</button>
+</nav>
+
+<main>
+
+<!-- PROJECT -->
+<section class="section active" id="tab-project">
+  <div class="panel">
+    <div class="panel-title"><h2>Project Information</h2></div>
+    <div class="grid cols-4">
+      <div class="field"><label>Project name</label><input id="p_name" value="Untitled Project"></div>
+      <div class="field"><label>Client</label><input id="p_client"></div>
+      <div class="field"><label>Site / location</label><input id="p_site"></div>
+      <div class="field"><label>Engineer</label><input id="p_eng"></div>
+      <div class="field"><label>Date</label><input id="p_date" type="date"></div>
+      <div class="field"><label>Project / reference no.</label><input id="p_ref"></div>
+    </div>
+    <div class="field" style="margin-top:8px;"><label>Analysis notes</label><input id="p_notes"></div>
+  </div>
+</section>
+
+<!-- EARTHQUAKE -->
+<section class="section" id="tab-eq">
+  <div class="panel">
+    <div class="panel-title"><h2>Earthquake &amp; Site Parameters</h2><span class="eq-ref">Eq. 1, 9, 23, 24</span></div>
+    <div class="grid cols-4">
+      <div class="field"><label>Moment magnitude, M<sub>w</sub></label><input id="e_mw" type="number" step="0.01" value="7.5"></div>
+      <div class="field"><label>Peak ground accel., a<sub>max</sub> (g)</label><input id="e_amax" type="number" step="0.001" value="0.30"></div>
+      <div class="field"><label>Groundwater table depth, z<sub>w</sub> (m)</label><input id="e_gwt" type="number" step="0.1" value="2.0"></div>
+      <div class="field"><label>Atmospheric pressure, P<sub>a</sub> (kPa)</label><input id="e_pa" type="number" step="0.1" value="101.3"></div>
+      <div class="field"><label>Unit weight of water, γ<sub>w</sub> (kN/m³)</label><input id="e_gw" type="number" step="0.01" value="9.81"></div>
+      <div class="field"><label>C<sub>N</sub> equation</label>
+        <select id="e_cn_eq"><option value="9">Eq. 9 — C_N=(Pa/σ'v)^0.5, cap 1.7</option><option value="10">Eq. 10 — C_N=2.2/(1.2+σ'v/Pa), cap 1.7</option></select>
+      </div>
+      <div class="field"><label>r<sub>d</sub> equation</label>
+        <select id="e_rd_eq"><option value="3">Blake approx., Eq. 3 (continuous)</option><option value="2">Liao &amp; Whitman, Eq. 2a/2b (piecewise)</option></select>
+      </div>
+      <div class="field"><label>MSF equation</label>
+        <select id="e_msf_eq"><option value="24">Idriss revised — Eq. 24 (recommended lower bound)</option><option value="seed">Seed &amp; Idriss (1982), Table 3 col.2 (interpolated)</option></select>
+      </div>
+    </div>
+    <div class="methnote">Units: SI throughout. Depths in m, stresses in kPa, unit weights in kN/m³. γ<sub>w</sub> defaults to 9.81 kN/m³.</div>
+  </div>
+</section>
+
+<!-- SPT INPUT -->
+<section class="section" id="tab-spt">
+  <div class="panel">
+    <div class="panel-title"><h2>SPT Raw Field Data</h2><span class="eq-ref">Table 2, Eq. 8</span></div>
+    <div class="table-wrap">
+      <table class="datatable" id="spt-table">
+        <thead><tr>
+          <th>Borehole</th><th>Depth (m)</th><th>N<sub>m</sub></th><th>γ (kN/m³)</th><th>FC (%)</th>
+          <th>Borehole dia.</th><th>Hammer type</th><th>Energy ratio ER (%)</th><th>Rod length (m)</th><th>Sampler</th><th></th>
+        </tr></thead>
+        <tbody id="spt-body"></tbody>
+      </table>
+    </div>
+    <div class="btnrow">
+      <button class="btn secondary" onclick="addSptRow()">+ Add SPT row</button>
+      <button class="btn secondary" onclick="loadSptExample()">Load example data</button>
+      <label class="btn secondary" style="display:inline-block;cursor:pointer;">Import CSV
+        <input type="file" accept=".csv" style="display:none" onchange="importCSV(this,'spt')">
+      </label>
+      <button class="btn danger" onclick="clearTable('spt')">Clear all</button>
+    </div>
+    <div class="small" style="margin-top:6px;">CSV columns expected: Borehole, Depth, N, Gamma, FC, BoreholeDiameter, HammerType, EnergyRatio, RodLength, SamplerType. Borehole diameter: 65–115 / 150 / 200 (mm). Hammer type: Donut / Safety / Automatic. Sampler: Standard / NoLiner.</div>
+  </div>
+</section>
+
+<!-- CPT INPUT -->
+<section class="section" id="tab-cpt">
+  <div class="panel">
+    <div class="panel-title"><h2>CPT Raw Field Data</h2><span class="eq-ref">Eq. 12–20</span></div>
+    <div class="table-wrap">
+      <table class="datatable" id="cpt-table">
+        <thead><tr>
+          <th>Sounding</th><th>Depth (m)</th><th>q<sub>c</sub> (MPa)</th><th>f<sub>s</sub> (kPa)</th><th>γ (kN/m³)</th><th></th>
+        </tr></thead>
+        <tbody id="cpt-body"></tbody>
+      </table>
+    </div>
+    <div class="btnrow">
+      <button class="btn secondary" onclick="addCptRow()">+ Add CPT row</button>
+      <button class="btn secondary" onclick="loadCptExample()">Load example data</button>
+      <label class="btn secondary" style="display:inline-block;cursor:pointer;">Import CSV
+        <input type="file" accept=".csv" style="display:none" onchange="importCSV(this,'cpt')">
+      </label>
+      <button class="btn danger" onclick="clearTable('cpt')">Clear all</button>
+    </div>
+    <div class="small" style="margin-top:6px;">CSV columns expected: Sounding, Depth, qc, fs, Gamma. qc in MPa, fs in kPa.</div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section class="section" id="tab-results">
+  <div class="panel">
+    <div class="panel-title"><h2>Calculate</h2></div>
+    <div class="btnrow">
+      <button class="btn" onclick="runAnalysis()">Run liquefaction analysis</button>
+      <button class="btn secondary" onclick="exportCSVResults('spt')">Export SPT results CSV</button>
+      <button class="btn secondary" onclick="exportCSVResults('cpt')">Export CPT results CSV</button>
+    </div>
+    <div id="warnings-out"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title"><h2>SPT Results</h2><span class="eq-ref">depth-by-depth</span></div>
+    <div class="table-wrap"><table class="datatable" id="spt-results"><thead></thead><tbody></tbody></table></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title"><h2>CPT Results</h2><span class="eq-ref">depth-by-depth</span></div>
+    <div class="table-wrap"><table class="datatable" id="cpt-results"><thead></thead><tbody></tbody></table></div>
+  </div>
+</section>
+
+<!-- GRAPHS -->
+<section class="section" id="tab-graphs">
+  <div class="panel">
+    <div class="panel-title"><h2>Factor of Safety vs Depth</h2></div>
+    <div class="legend-item"><span class="swatch" style="background:#28578C"></span>SPT</div>
+    <div class="legend-item"><span class="swatch" style="background:#A32424"></span>CPT</div>
+    <div class="legend-item"><span class="swatch" style="background:#9C5B12"></span>FS = 1.0 threshold</div>
+    <div id="fs-chart" class="chart-wrap"></div>
+  </div>
+  <div class="panel">
+    <div class="panel-title"><h2>Profile Plots</h2></div>
+    <div id="profile-charts" class="chart-wrap"></div>
+  </div>
+</section>
+
+<!-- METHODOLOGY -->
+<section class="section" id="tab-methodology">
+  <div class="panel">
+    <div class="panel-title"><h2>Calculation Methodology &amp; References</h2></div>
+    <p><strong>Primary reference:</strong> Youd, T.L. and Idriss, I.M. (2001). "Liquefaction Resistance of Soils: Summary Report from the 1996 NCEER and 1998 NCEER/NSF Workshops on Evaluation of Liquefaction Resistance of Soils." <em>Journal of Geotechnical and Geoenvironmental Engineering</em>, ASCE, 127(4), 297–313.</p>
+    <table class="datatable" style="text-align:left;">
+      <thead><tr><th style="text-align:left;">Quantity</th><th style="text-align:left;">Equation used</th><th style="text-align:left;">Eq. #</th></tr></thead>
+      <tbody id="methodology-table"></tbody>
+    </table>
+    <div class="warnbox">This is the <strong>default (only)</strong> methodology implemented: the NCEER/NSF workshop "simplified procedure." No other liquefaction method (Boulanger &amp; Idriss, Cetin, Moss, Andrus &amp; Stokoe) is used or blended in. Valid only for level to gently sloping ground, Holocene alluvial/fluvial soils, depths &lt; ~15–20 m, non-gravelly soils.</div>
+  </div>
+</section>
+
+</main>
+
+<footer class="meth">
+  Calculation engine is separate from the UI (see <span class="mono">Engine</span> object in source). All intermediate values are traceable via "Show calculation" in the results table. Built for engineering review — verify independently before use on real projects.
+</footer>
+
+<script>
+/* ============================================================
+   TAB NAVIGATION
+   ============================================================ */
+document.getElementById('tabs').addEventListener('click', e=>{
+  if(e.target.tagName!=='BUTTON') return;
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('main .section').forEach(s=>s.classList.remove('active'));
+  e.target.classList.add('active');
+  document.getElementById('tab-'+e.target.dataset.tab).classList.add('active');
+});
+
+/* ============================================================
+   DATA ROW MANAGEMENT
+   ============================================================ */
+let sptRowId=0, cptRowId=0;
+
+function addSptRow(vals){
+  vals = vals || {bh:'BH-1',depth:'',n:'',gamma:18.5,fc:0,dia:'65-115',hammer:'Safety',er:60,rod:'',sampler:'Standard'};
+  const id = 'spt'+(sptRowId++);
+  const tr = document.createElement('tr');
+  tr.id = id;
+  tr.innerHTML = `
+    <td><input value="${vals.bh}" style="text-align:left;width:64px;"></td>
+    <td><input type="number" step="0.1" value="${vals.depth}" style="width:60px;"></td>
+    <td><input type="number" step="1" value="${vals.n}" style="width:50px;"></td>
+    <td><input type="number" step="0.1" value="${vals.gamma}" style="width:56px;"></td>
+    <td><input type="number" step="0.1" value="${vals.fc}" style="width:54px;"></td>
+    <td><select style="width:80px;">
+      <option value="65-115" ${vals.dia=='65-115'?'selected':''}>65–115 mm</option>
+      <option value="150" ${vals.dia=='150'?'selected':''}>150 mm</option>
+      <option value="200" ${vals.dia=='200'?'selected':''}>200 mm</option>
+    </select></td>
+    <td><select style="width:84px;">
+      <option value="Donut" ${vals.hammer=='Donut'?'selected':''}>Donut</option>
+      <option value="Safety" ${vals.hammer=='Safety'?'selected':''}>Safety</option>
+      <option value="Automatic" ${vals.hammer=='Automatic'?'selected':''}>Automatic</option>
+    </select></td>
+    <td><input type="number" step="1" value="${vals.er}" style="width:52px;"></td>
+    <td><input type="number" step="0.1" value="${vals.rod}" style="width:54px;"></td>
+    <td><select style="width:80px;">
+      <option value="Standard" ${vals.sampler=='Standard'?'selected':''}>Standard</option>
+      <option value="NoLiner" ${vals.sampler=='NoLiner'?'selected':''}>No liner</option>
+    </select></td>
+    <td class="rm" onclick="document.getElementById('${id}').remove()">✕</td>`;
+  document.getElementById('spt-body').appendChild(tr);
+}
+
+function addCptRow(vals){
+  vals = vals || {cid:'CPT-1',depth:'',qc:'',fs:'',gamma:18.5};
+  const id = 'cpt'+(cptRowId++);
+  const tr = document.createElement('tr');
+  tr.id = id;
+  tr.innerHTML = `
+    <td><input value="${vals.cid}" style="text-align:left;width:64px;"></td>
+    <td><input type="number" step="0.05" value="${vals.depth}" style="width:60px;"></td>
+    <td><input type="number" step="0.01" value="${vals.qc}" style="width:60px;"></td>
+    <td><input type="number" step="1" value="${vals.fs}" style="width:60px;"></td>
+    <td><input type="number" step="0.1" value="${vals.gamma}" style="width:56px;"></td>
+    <td class="rm" onclick="document.getElementById('${id}').remove()">✕</td>`;
+  document.getElementById('cpt-body').appendChild(tr);
+}
+
+function clearTable(kind){
+  document.getElementById(kind+'-body').innerHTML='';
+}
+
+function readSptRows(){
+  const rows=[];
+  document.querySelectorAll('#spt-body tr').forEach(tr=>{
+    const c = tr.querySelectorAll('input, select');
+    rows.push({
+      bh:c[0].value||'BH-1', depth:parseFloat(c[1].value), n:parseFloat(c[2].value),
+      gamma:parseFloat(c[3].value), fc:parseFloat(c[4].value), dia:c[5].value,
+      hammer:c[6].value, er:parseFloat(c[7].value), rod:parseFloat(c[8].value), sampler:c[9].value
+    });
+  });
+  return rows;
+}
+function readCptRows(){
+  const rows=[];
+  document.querySelectorAll('#cpt-body tr').forEach(tr=>{
+    const c = tr.querySelectorAll('input');
+    rows.push({
+      cid:c[0].value||'CPT-1', depth:parseFloat(c[1].value), qc:parseFloat(c[2].value),
+      fs:parseFloat(c[3].value), gamma:parseFloat(c[4].value)
+    });
+  });
+  return rows;
+}
+
+function loadSptExample(){
+  clearTable('spt');
+  [[2.0,10,18.0,8],[3.0,14,18.5,12],[4.0,20,19.0,18],[5.0,9,18.2,25],[6.0,25,19.2,3]].forEach(r=>{
+    addSptRow({bh:'BH-1',depth:r[0],n:r[1],gamma:r[2],fc:r[3],dia:'65-115',hammer:'Safety',er:60,rod:5,sampler:'Standard'});
+  });
+}
+function loadCptExample(){
+  clearTable('cpt');
+  let d=1.0;
+  const qcs=[2.5,2.7,3.0,3.4,4.0,3.2,2.1,5.5,8.2,9.0];
+  const fss=[35,37,40,42,48,55,60,70,90,95];
+  for(let i=0;i<qcs.length;i++){
+    addCptRow({cid:'CPT-1',depth:(1.0+i*0.5).toFixed(2),qc:qcs[i],fs:fss[i],gamma:18.5});
+  }
+}
+
+function tableToCSV(rows, headers, mapFn){
+  let out = headers.join(',')+'\n';
+  rows.forEach(r=> out += mapFn(r).join(',')+'\n');
+  return out;
+}
+function downloadText(filename, text){
+  const blob = new Blob([text],{type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+function importCSV(input, kind){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev=>{
+    const lines = ev.target.result.split(/\r?\n/).filter(l=>l.trim().length);
+    const headers = lines[0].split(',').map(h=>h.trim().toLowerCase());
+    clearTable(kind);
+    for(let i=1;i<lines.length;i++){
+      const cells = lines[i].split(',');
+      const get = name=>{ const idx = headers.indexOf(name); return idx>=0? cells[idx]:''; };
+      if(kind==='spt'){
+        addSptRow({
+          bh:get('borehole')||'BH-1', depth:get('depth'), n:get('n'),
+          gamma:get('gamma')||18.5, fc:get('fc')||0,
+          dia:get('boreholediameter')||'65-115', hammer:get('hammertype')||'Safety',
+          er:get('energyratio')||60, rod:get('rodlength'), sampler:get('samplertype')||'Standard'
+        });
+      } else {
+        addCptRow({
+          cid:get('sounding')||'CPT-1', depth:get('depth'), qc:get('qc'), fs:get('fs'), gamma:get('gamma')||18.5
+        });
+      }
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ============================================================
+   CALCULATION ENGINE — Youd & Idriss (2001)
+   Kept independent of the UI so it is separately testable.
+   Equation numbers refer to Youd & Idriss (2001), J. Geotech.
+   & Geoenvir. Engrg. 127(4):297-313.
+   ============================================================ */
+const Engine = {
+
+  /* --- stresses: cumulative layering by group, sorted by depth --- */
+  computeStressProfile(rows, groupKey, gwtDepth, gammaW){
+    const groups = {};
+    rows.forEach(r=>{ (groups[r[groupKey]] = groups[r[groupKey]]||[]).push(r); });
+    const out = [];
+    Object.keys(groups).forEach(g=>{
+      const grp = groups[g].slice().sort((a,b)=>a.depth-b.depth);
+      let prevDepth = 0, sigmaV = 0;
+      grp.forEach(r=>{
+        const thickness = Math.max(r.depth - prevDepth, 0);
+        sigmaV += thickness * r.gamma;
+        prevDepth = r.depth;
+        const u = r.depth > gwtDepth ? gammaW * (r.depth - gwtDepth) : 0;
+        let sigmaVeff = sigmaV - u;
+        r._sigmaV = sigmaV;
+        r._u = u;
+        r._sigmaVeff = sigmaVeff;
+        out.push(r);
+      });
+    });
+    return out;
+  },
+
+  /* --- rd : Eq. 2a/2b (piecewise) or Eq. 3 (Blake continuous) --- */
+  rd(z, method){
+    if(method==='2'){
+      if(z<=9.15) return 1.0 - 0.00765*z;
+      if(z<=23) return 1.174 - 0.0267*z;
+      return 1.174 - 0.0267*z; // beyond verified range; flagged by caller
+    }
+    // Eq. 3 (Blake) - valid for routine use, smoother
+    const num = 1.000 - 0.4113*Math.pow(z,0.5) + 0.04052*z + 0.001753*Math.pow(z,1.5);
+    const den = 1.000 - 0.4177*Math.pow(z,0.5) + 0.05729*z - 0.006205*Math.pow(z,1.5) + 0.001210*Math.pow(z,2);
+    return num/den;
+  },
+
+  /* --- CSR : Eq. 1 --- */
+  CSR(amax, sigmaV, sigmaVeff, rd){
+    return 0.65 * amax * (sigmaV/sigmaVeff) * rd;
+  },
+
+  /* --- MSF --- */
+  MSF(Mw, method){
+    if(method==='24') return Math.pow(10,2.24)/Math.pow(Mw,2.56); // Eq. 24, Idriss revised
+    // Seed & Idriss (1982) Table 3 col.2, linear interpolation
+    const table = [[5.5,1.43],[6.0,1.32],[6.5,1.19],[7.0,1.08],[7.5,1.00],[8.0,0.94],[8.5,0.89]];
+    if(Mw<=table[0][0]) return table[0][1];
+    if(Mw>=table[table.length-1][0]) return table[table.length-1][1];
+    for(let i=0;i<table.length-1;i++){
+      if(Mw>=table[i][0] && Mw<=table[i+1][0]){
+        const [m1,f1]=table[i], [m2,f2]=table[i+1];
+        return f1 + (f2-f1)*(Mw-m1)/(m2-m1);
+      }
+    }
+  },
+
+  /* ---------- SPT ---------- */
+  CN(sigmaVeff, Pa, method){
+    let cn;
+    if(method==='10') cn = 2.2/(1.2 + sigmaVeff/Pa);       // Eq. 10
+    else cn = Math.pow(Pa/Math.max(sigmaVeff,1e-6), 0.5);   // Eq. 9
+    return { value: Math.min(cn,1.7), capped: cn>1.7 };
+  },
+  CE(ER){ return ER/60; },
+  CB(dia){
+    if(dia==='150') return 1.05;
+    if(dia==='200') return 1.15;
+    return 1.0; // 65-115 mm
+  },
+  CR(rodLength){
+    if(rodLength<3) return 0.75;
+    if(rodLength<4) return 0.80;
+    if(rodLength<6) return 0.85;
+    if(rodLength<10) return 0.95;
+    return 1.00;
+  },
+  CS(sampler){ return sampler==='NoLiner' ? 1.2 : 1.0; }, // Table 2 range 1.1-1.3; midpoint used
+  N160(Nm,CN,CE,CB,CR,CS){ return Nm*CN*CE*CB*CR*CS; }, // Eq. 8
+
+  finesCorrection(FC, N160){
+    let alpha, beta;
+    if(FC<=5){ alpha=0; beta=1.0; }
+    else if(FC<35){ alpha=Math.exp(1.76-(190/(FC*FC))); beta=0.99+(Math.pow(FC,1.5)/1000); } // Eq 6b/7b
+    else { alpha=5.0; beta=1.2; } // Eq 6c/7c
+    const N160cs = alpha + beta*N160; // Eq. 5
+    return {alpha,beta,N160cs};
+  },
+
+  CRR_SPT(N160cs){
+    // Rauch approximation of SPT clean-sand base curve, Eq. 4. Valid for (N1)60cs < 30.
+    if(N160cs>=30) return { crr:null, tooDense:true };
+    const crr = 1/(34-N160cs) + N160cs/135 + 50/Math.pow(10*N160cs+45,2) - 1/200;
+    return { crr, tooDense:false };
+  },
+
+  /* ---------- CPT ---------- */
+  // returns {n, Ic, Q, F, path} after Robertson & Wride iterative procedure
+  cptSoilIndex(qc_kPa, fs_kPa, sigmaV, sigmaVeff, Pa){
+    const clamp = x=> isFinite(x)? x : 0;
+    function QF(n){
+      const CQ = Math.min(Math.pow(Pa/Math.max(sigmaVeff,1e-6), n), 1.7);
+      const Q = ((qc_kPa - sigmaV)/Pa) * Math.pow(Pa/Math.max(sigmaVeff,1e-6), n); // Eq. 15
+      const F = (fs_kPa/Math.max(qc_kPa - sigmaV,1e-6)) * 100;                      // Eq. 16
+      return {Q,F,CQ};
+    }
+    function Ic(Q,F){
+      const logQ = Math.log10(Math.max(Q,1e-6));
+      const logF = Math.log10(Math.max(F,1e-6));
+      return Math.pow(Math.pow(3.47-logQ,2) + Math.pow(1.22+logF,2), 0.5); // Eq. 14
+    }
+    // Step 1: n=1.0 (clay assumption)
+    let step1 = QF(1.0);
+    let ic1 = Ic(step1.Q, step1.F);
+    if(ic1 > 2.6){
+      return {n:1.0, Ic:ic1, Q:step1.Q, F:step1.F, path:'n=1.0 (clayey, Ic>2.6) — too clay-rich to liquefy per this procedure'};
+    }
+    // Step 2: n=0.5 (granular assumption)
+    let step2 = QF(0.5);
+    let ic2 = Ic(step2.Q, step2.F);
+    if(ic2 <= 2.6){
+      return {n:0.5, Ic:ic2, Q:step2.Q, F:step2.F, path:'n=0.5 (clean granular)'};
+    }
+    // Step 3: intermediate n=0.7
+    let step3 = QF(0.7);
+    let ic3 = Ic(step3.Q, step3.F);
+    return {n:0.7, Ic:ic3, Q:step3.Q, F:step3.F, path:'n=0.7 (silty / intermediate)'};
+  },
+  CQ(sigmaVeff, Pa, n){
+    const cq = Math.pow(Pa/Math.max(sigmaVeff,1e-6), n);
+    return { value: Math.min(cq,1.7), capped: cq>1.7 };
+  },
+  qc1N(CQ, qc_kPa, Pa){ return CQ*(qc_kPa/Pa); }, // Eq. 12
+  Kc(Ic){
+    if(Ic<=1.64) return 1.0; // Eq. 19a
+    return -0.403*Math.pow(Ic,4) + 5.581*Math.pow(Ic,3) - 21.63*Math.pow(Ic,2) + 33.75*Ic - 17.88; // Eq. 19b
+  },
+  CRR_CPT(qc1Ncs){
+    if(qc1Ncs>=160) return { crr:null, tooDense:true };
+    if(qc1Ncs<50) return { crr: 0.833*(qc1Ncs/1000) + 0.05, tooDense:false };              // Eq. 11a
+    return { crr: 93*Math.pow(qc1Ncs/1000,3) + 0.08, tooDense:false };                      // Eq. 11b
+  },
+
+  FS(crr, csr, msf){ return (crr/csr)*msf; } // Eq. 23
+};
+
+/* ============================================================
+   ANALYSIS DRIVER
+   ============================================================ */
+let lastSptResults = [], lastCptResults = [];
+
+function runAnalysis(){
+  const warnings = [];
+  const Pa = parseFloat(document.getElementById('e_pa').value);
+  const gammaW = parseFloat(document.getElementById('e_gw').value);
+  const gwtDepth = parseFloat(document.getElementById('e_gwt').value);
+  const amax = parseFloat(document.getElementById('e_amax').value);
+  const Mw = parseFloat(document.getElementById('e_mw').value);
+  const cnMethod = document.getElementById('e_cn_eq').value;
+  const rdMethod = document.getElementById('e_rd_eq').value;
+  const msfMethod = document.getElementById('e_msf_eq').value;
+
+  if(Mw<5.0 || Mw>8.5) warnings.push({level:'warn', text:`Moment magnitude ${Mw} is outside the range (5.5–8.5) with good case-history support; MSF becomes poorly constrained beyond this range.`});
+  if(gwtDepth<0) warnings.push({level:'warn', text:'Groundwater table above ground surface — confirm this is intended (e.g. ponded surface water).'});
+
+  /* ---- SPT ---- */
+  let sptRows = readSptRows().filter(r=>!isNaN(r.depth));
+  const sptErrors = [];
+  sptRows = sptRows.filter(r=>{
+    if(r.depth<0){ sptErrors.push(`SPT ${r.bh}: negative depth — row skipped.`); return false; }
+    if(isNaN(r.n) || r.n<0){ sptErrors.push(`SPT ${r.bh} @ ${r.depth} m: negative or missing N — row skipped.`); return false; }
+    if(isNaN(r.fc) || r.fc<0 || r.fc>100){ sptErrors.push(`SPT ${r.bh} @ ${r.depth} m: fines content outside 0–100% — row skipped.`); return false; }
+    return true;
+  });
+  sptRows = Engine.computeStressProfile(sptRows, 'bh', gwtDepth, gammaW);
+  sptRows.sort((a,b)=> a.bh.localeCompare(b.bh) || a.depth-b.depth);
+
+  lastSptResults = sptRows.map(r=>{
+    const rowWarn = [];
+    if(r._sigmaVeff<=0){ rowWarn.push('σ\'v ≤ 0 — result unreliable at this depth.'); }
+    const cn = Engine.CN(r._sigmaVeff, Pa, cnMethod);
+    if(cn.capped) rowWarn.push('C_N capped at 1.7 (Eq. 9/10 limit).');
+    const ce = Engine.CE(r.er);
+    const cb = Engine.CB(r.dia);
+    const cr = Engine.CR(r.rod);
+    const cs = Engine.CS(r.sampler);
+    const n160 = Engine.N160(r.n, cn.value, ce, cb, cr, cs);
+    const fines = Engine.finesCorrection(r.fc, n160);
+    const rd = Engine.rd(r.depth, rdMethod);
+    if(r.depth>23) rowWarn.push('Depth beyond simplified-procedure verification range (~15–23 m) — rd/CRR uncertain.');
+    const csr = Engine.CSR(amax, r._sigmaV, r._sigmaVeff, rd);
+    const crrObj = Engine.CRR_SPT(fines.N160cs);
+    const msf = Engine.MSF(Mw, msfMethod);
+    let fs, status;
+    if(crrObj.tooDense){ fs=null; status='Not susceptible ((N1)60cs ≥ 30, too dense)'; }
+    else { fs = Engine.FS(crrObj.crr, csr, msf); status = fs<1.0 ? 'Liquefiable (FS<1.0)' : 'Not liquefiable (FS≥1.0)'; }
+    if(r.fc>=2.4 && r.fc<2.4){} // no-op placeholder (kept for symmetry with CPT Ic flag)
+    return {...r, cn, ce, cb, cr, cs, n160, fines, rd, csr, crrObj, msf, fs, status, rowWarn};
+  });
+
+  /* ---- CPT ---- */
+  let cptRows = readCptRows().filter(r=>!isNaN(r.depth));
+  const cptErrors = [];
+  cptRows = cptRows.filter(r=>{
+    if(r.depth<0){ cptErrors.push(`CPT ${r.cid}: negative depth — row skipped.`); return false; }
+    if(isNaN(r.qc) || r.qc<0){ cptErrors.push(`CPT ${r.cid} @ ${r.depth} m: negative or missing qc — row skipped.`); return false; }
+    if(isNaN(r.fs) || r.fs<0){ cptErrors.push(`CPT ${r.cid} @ ${r.depth} m: negative sleeve friction — row skipped.`); return false; }
+    return true;
+  });
+  cptRows = Engine.computeStressProfile(cptRows, 'cid', gwtDepth, gammaW);
+  cptRows.sort((a,b)=> a.cid.localeCompare(b.cid) || a.depth-b.depth);
+
+  lastCptResults = cptRows.map(r=>{
+    const rowWarn = [];
+    if(r._sigmaVeff<=0){ rowWarn.push('σ\'v ≤ 0 — result unreliable at this depth.'); }
+    const qc_kPa = r.qc*1000;
+    const idx = Engine.cptSoilIndex(qc_kPa, r.fs, r._sigmaV, r._sigmaVeff, Pa);
+    if(idx.Ic>2.6) rowWarn.push('Ic > 2.6: soil likely too clay-rich/plastic to liquefy by this procedure — recommend sampling/Chinese criteria check.');
+    if(idx.Ic>=2.4 && idx.Ic<=2.6) rowWarn.push('Ic between 2.4–2.6: workshop recommends sampling to confirm soil type.');
+    const cq = Engine.CQ(r._sigmaVeff, Pa, idx.n);
+    if(cq.capped) rowWarn.push('C_Q capped at 1.7.');
+    const qc1n = Engine.qc1N(cq.value, qc_kPa, Pa);
+    const kc = Engine.Kc(idx.Ic);
+    const qc1ncs = kc*qc1n;
+    const rd = Engine.rd(r.depth, rdMethod);
+    if(r.depth>23) rowWarn.push('Depth beyond simplified-procedure verification range (~15–23 m) — rd/CRR uncertain.');
+    const csr = Engine.CSR(amax, r._sigmaV, r._sigmaVeff, rd);
+    const crrObj = Engine.CRR_CPT(qc1ncs);
+    const msf = Engine.MSF(Mw, msfMethod);
+    let fs, status;
+    const tooClay = idx.Ic>2.6;
+    if(tooClay){ fs=null; status='Not evaluated (Ic>2.6, clay-rich)'; }
+    else if(crrObj.tooDense){ fs=null; status='Not susceptible ((qc1N)cs ≥ 160, too dense)'; }
+    else { fs = Engine.FS(crrObj.crr, csr, msf); status = fs<1.0 ? 'Liquefiable (FS<1.0)' : 'Not liquefiable (FS≥1.0)'; }
+    return {...r, idx, cq, qc1n, kc, qc1ncs, rd, csr, crrObj, msf, fs, status, rowWarn, tooClay};
+  });
+
+  renderWarnings(warnings, sptErrors, cptErrors);
+  renderSptResults();
+  renderCptResults();
+  renderCharts();
+  renderMethodologyTable(cnMethod, rdMethod, msfMethod);
+  document.querySelector('nav.tabs button[data-tab="results"]').click();
+}
+
+function renderWarnings(general, sptErr, cptErr){
+  const box = document.getElementById('warnings-out');
+  let html='';
+  general.forEach(w=> html += `<div class="warnbox">${w.text}</div>`);
+  sptErr.forEach(t=> html += `<div class="warnbox err">SPT — ${t}</div>`);
+  cptErr.forEach(t=> html += `<div class="warnbox err">CPT — ${t}</div>`);
+  box.innerHTML = html;
+}
+
+function fmt(x,d=3){ return (x===null||x===undefined||isNaN(x)) ? '—' : Number(x).toFixed(d); }
+
+function renderSptResults(){
+  const thead = document.querySelector('#spt-results thead');
+  const tbody = document.querySelector('#spt-results tbody');
+  thead.innerHTML = `<tr>
+    <th>BH</th><th>Depth</th><th>N<sub>m</sub></th><th>σv</th><th>σ'v</th><th>C<sub>N</sub></th><th>C<sub>E</sub></th>
+    <th>C<sub>B</sub></th><th>C<sub>R</sub></th><th>C<sub>S</sub></th><th>(N1)60</th><th>FC</th><th>(N1)60cs</th>
+    <th>r<sub>d</sub></th><th>CSR</th><th>CRR7.5</th><th>MSF</th><th>FS</th><th>Status</th><th></th></tr>`;
+  tbody.innerHTML='';
+  lastSptResults.forEach((r,i)=>{
+    const tr = document.createElement('tr');
+    tr.className = r.fs===null ? '' : (r.fs<1.0 ? 'liq':'nonliq');
+    tr.innerHTML = `<td style="text-align:left">${r.bh}</td><td>${fmt(r.depth,1)}</td><td>${fmt(r.n,0)}</td>
+      <td>${fmt(r._sigmaV,1)}</td><td>${fmt(r._sigmaVeff,1)}</td><td>${fmt(r.cn.value,2)}</td><td>${fmt(r.ce,2)}</td>
+      <td>${fmt(r.cb,2)}</td><td>${fmt(r.cr,2)}</td><td>${fmt(r.cs,2)}</td><td>${fmt(r.n160,2)}</td><td>${fmt(r.fc,0)}</td>
+      <td>${fmt(r.fines.N160cs,2)}</td><td>${fmt(r.rd,3)}</td><td>${fmt(r.csr,3)}</td>
+      <td>${r.crrObj.tooDense?'n/a':fmt(r.crrObj.crr,3)}</td><td>${fmt(r.msf,2)}</td>
+      <td>${r.fs===null?'—':fmt(r.fs,2)}</td>
+      <td><span class="badge ${r.fs===null?'warn':(r.fs<1?'liq':'nonliq')}">${r.status}</span>${r.rowWarn.map(w=>`<div class="small" style="color:#9C5B12">${w}</div>`).join('')}</td>
+      <td><details class="calc"><summary>calc</summary><div class="calcbox">${sptCalcText(r)}</div></details></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function sptCalcText(r){
+  return `σv = Σ(γ·Δz) = ${fmt(r._sigmaV,2)} kPa
+σ'v = σv − u = ${fmt(r._sigmaV,2)} − ${fmt(r._u,2)} = ${fmt(r._sigmaVeff,2)} kPa
+C_N = ${fmt(r.cn.value,3)}${r.cn.capped?' (capped 1.7)':''}
+C_E = ER/60 = ${r.er}/60 = ${fmt(r.ce,3)}
+C_B = ${fmt(r.cb,2)} (dia=${r.dia} mm)
+C_R = ${fmt(r.cr,2)} (rod=${r.rod} m)
+C_S = ${fmt(r.cs,2)} (${r.sampler})
+(N1)60 = Nm·C_N·C_E·C_B·C_R·C_S = ${r.n}×${fmt(r.cn.value,3)}×${fmt(r.ce,3)}×${fmt(r.cb,2)}×${fmt(r.cr,2)}×${fmt(r.cs,2)} = ${fmt(r.n160,3)}
+FC = ${r.fc}%  →  α=${fmt(r.fines.alpha,3)}, β=${fmt(r.fines.beta,3)}
+(N1)60cs = α + β·(N1)60 = ${fmt(r.fines.alpha,3)} + ${fmt(r.fines.beta,3)}×${fmt(r.n160,3)} = ${fmt(r.fines.N160cs,3)}
+r_d = ${fmt(r.rd,4)}
+CSR = 0.65·(amax/g)·(σv/σ'v)·rd = ${fmt(r.csr,4)}
+CRR7.5 (Eq.4, Rauch approx.) = ${r.crrObj.tooDense?'n/a — (N1)60cs≥30, too dense to liquefy':fmt(r.crrObj.crr,4)}
+MSF = ${fmt(r.msf,3)} (Mw)
+FS = (CRR7.5/CSR)×MSF = ${r.fs===null?'n/a':fmt(r.fs,3)}`;
+}
+
+function renderCptResults(){
+  const thead = document.querySelector('#cpt-results thead');
+  const tbody = document.querySelector('#cpt-results tbody');
+  thead.innerHTML = `<tr>
+    <th>Sounding</th><th>Depth</th><th>q<sub>c</sub></th><th>f<sub>s</sub></th><th>σv</th><th>σ'v</th><th>Q</th><th>F</th>
+    <th>I<sub>c</sub></th><th>n</th><th>C<sub>Q</sub></th><th>q<sub>c1N</sub></th><th>K<sub>c</sub></th><th>(q<sub>c1N</sub>)cs</th>
+    <th>r<sub>d</sub></th><th>CSR</th><th>CRR7.5</th><th>MSF</th><th>FS</th><th>Status</th><th></th></tr>`;
+  tbody.innerHTML='';
+  lastCptResults.forEach(r=>{
+    const tr = document.createElement('tr');
+    tr.className = r.fs===null ? '' : (r.fs<1.0 ? 'liq':'nonliq');
+    tr.innerHTML = `<td style="text-align:left">${r.cid}</td><td>${fmt(r.depth,2)}</td><td>${fmt(r.qc,2)}</td><td>${fmt(r.fs,0)}</td>
+      <td>${fmt(r._sigmaV,1)}</td><td>${fmt(r._sigmaVeff,1)}</td><td>${fmt(r.idx.Q,1)}</td><td>${fmt(r.idx.F,2)}</td>
+      <td>${fmt(r.idx.Ic,2)}</td><td>${fmt(r.idx.n,2)}</td><td>${fmt(r.cq.value,2)}</td><td>${fmt(r.qc1n,1)}</td>
+      <td>${fmt(r.kc,2)}</td><td>${fmt(r.qc1ncs,1)}</td><td>${fmt(r.rd,3)}</td><td>${fmt(r.csr,3)}</td>
+      <td>${(r.crrObj&&!r.crrObj.tooDense)?fmt(r.crrObj.crr,3):'n/a'}</td><td>${fmt(r.msf,2)}</td>
+      <td>${r.fs===null?'—':fmt(r.fs,2)}</td>
+      <td><span class="badge ${r.fs===null?'warn':(r.fs<1?'liq':'nonliq')}">${r.status}</span>${r.rowWarn.map(w=>`<div class="small" style="color:#9C5B12">${w}</div>`).join('')}</td>
+      <td><details class="calc"><summary>calc</summary><div class="calcbox">${cptCalcText(r)}</div></details></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function cptCalcText(r){
+  return `σv = ${fmt(r._sigmaV,2)} kPa ,  σ'v = ${fmt(r._sigmaVeff,2)} kPa
+qc = ${r.qc} MPa = ${fmt(r.qc*1000,1)} kPa
+Soil index iteration: ${r.idx.path}
+Q = [(qc−σv)/Pa]·(Pa/σ'v)^n = ${fmt(r.idx.Q,3)}
+F = [fs/(qc−σv)]×100% = ${fmt(r.idx.F,3)}
+Ic = [(3.47−logQ)² + (1.22+logF)²]^0.5 = ${fmt(r.idx.Ic,3)}
+C_Q = (Pa/σ'v)^n = ${fmt(r.cq.value,3)}${r.cq.capped?' (capped 1.7)':''}
+qc1N = C_Q·(qc/Pa) = ${fmt(r.qc1n,3)}
+K_c = ${fmt(r.kc,3)} (from Ic=${fmt(r.idx.Ic,3)})
+(qc1N)cs = K_c·qc1N = ${fmt(r.qc1ncs,3)}
+r_d = ${fmt(r.rd,4)}
+CSR = ${fmt(r.csr,4)}
+CRR7.5 (Eq.11) = ${r.tooClay?'n/a — Ic>2.6, clay-rich':(r.crrObj.tooDense?'n/a — (qc1N)cs≥160, too dense':fmt(r.crrObj.crr,4))}
+MSF = ${fmt(r.msf,3)}
+FS = ${r.fs===null?'n/a':fmt(r.fs,3)}`;
+}
+
+/* ============================================================
+   CHARTS (lightweight inline SVG — no external chart lib)
+   ============================================================ */
+function svgFSChart(results, color, w, h){
+  if(!results.length) return '';
+  const maxDepth = Math.max(...results.map(r=>r.depth))*1.1;
+  const maxFS = Math.max(2.5, ...results.filter(r=>r.fs!==null).map(r=>r.fs))*1.05;
+  const padL=44,padT=14,padB=30,padR=14;
+  const plotW = w-padL-padR, plotH = h-padT-padB;
+  const x = fs => padL + (fs/maxFS)*plotW;
+  const y = d => padT + (d/maxDepth)*plotH;
+  let pts = results.filter(r=>r.fs!==null).map(r=>`${x(r.fs).toFixed(1)},${y(r.depth).toFixed(1)}`).join(' ');
+  let circles = results.filter(r=>r.fs!==null).map(r=>`<circle cx="${x(r.fs).toFixed(1)}" cy="${y(r.depth).toFixed(1)}" r="3.2" fill="${r.fs<1?'#A32424':'#276B3E'}" stroke="${color}" stroke-width="0.8"/>`).join('');
+  let grid='';
+  for(let gx=0; gx<=maxFS; gx+=0.5){ grid+=`<line x1="${x(gx)}" y1="${padT}" x2="${x(gx)}" y2="${h-padB}" stroke="#E7E2D3"/><text x="${x(gx)}" y="${h-padB+13}" font-size="9" text-anchor="middle" fill="#525B66">${gx.toFixed(1)}</text>`; }
+  for(let gz=0; gz<=maxDepth; gz+=Math.max(1,Math.round(maxDepth/8))){ grid+=`<line x1="${padL}" y1="${y(gz)}" x2="${w-padR}" y2="${y(gz)}" stroke="#E7E2D3"/><text x="${padL-6}" y="${y(gz)+3}" font-size="9" text-anchor="end" fill="#525B66">${gz.toFixed(0)}</text>`; }
+  return `<svg class="plot" width="${w}" height="${h}">
+    ${grid}
+    <line x1="${x(1)}" y1="${padT}" x2="${x(1)}" y2="${h-padB}" stroke="#9C5B12" stroke-width="1.5" stroke-dasharray="4,3"/>
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.3"/>
+    ${circles}
+    <text x="${padL}" y="12" font-size="10" fill="#1C2530" font-family="IBM Plex Mono">FS vs Depth</text>
+    <text x="${w/2}" y="${h-4}" font-size="9" text-anchor="middle" fill="#525B66">Factor of Safety</text>
+  </svg>`;
+}
+
+function svgProfile(results, key, label, w, h, color){
+  const vals = results.map(r=>key(r)).filter(v=>v!==null && !isNaN(v));
+  if(!vals.length) return '';
+  const maxDepth = Math.max(...results.map(r=>r.depth))*1.1;
+  const maxV = Math.max(...vals)*1.15 || 1;
+  const padL=40,padT=16,padB=26,padR=10;
+  const plotW=w-padL-padR, plotH=h-padT-padB;
+  const x = v => padL + (v/maxV)*plotW;
+  const y = d => padT + (d/maxDepth)*plotH;
+  const pts = results.filter(r=>key(r)!==null && !isNaN(key(r))).map(r=>`${x(key(r)).toFixed(1)},${y(r.depth).toFixed(1)}`).join(' ');
+  return `<svg class="plot" width="${w}" height="${h}">
+    <text x="${padL}" y="12" font-size="10" fill="#1C2530" font-family="IBM Plex Mono">${label}</text>
+    <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${h-padB}" stroke="#C7C0AC"/>
+    <line x1="${padL}" y1="${h-padB}" x2="${w-padR}" y2="${h-padB}" stroke="#C7C0AC"/>
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.3"/>
+  </svg>`;
+}
+
+function renderCharts(){
+  const fsDiv = document.getElementById('fs-chart');
+  fsDiv.innerHTML = svgFSChart(lastSptResults,'#28578C',300,340) + svgFSChart(lastCptResults,'#A32424',300,340);
+
+  const pd = document.getElementById('profile-charts');
+  let html='';
+  if(lastSptResults.length){
+    html += svgProfile(lastSptResults, r=>r.n, 'N vs depth (SPT)', 220,260,'#28578C');
+    html += svgProfile(lastSptResults, r=>r.n160, '(N1)60 vs depth', 220,260,'#28578C');
+    html += svgProfile(lastSptResults, r=>r.fines.N160cs, '(N1)60cs vs depth', 220,260,'#28578C');
+    html += svgProfile(lastSptResults, r=>r.csr, 'CSR vs depth (SPT)', 220,260,'#28578C');
+  }
+  if(lastCptResults.length){
+    html += svgProfile(lastCptResults, r=>r.qc, 'qc (MPa) vs depth', 220,260,'#A32424');
+    html += svgProfile(lastCptResults, r=>r.idx.Ic, 'Ic vs depth', 220,260,'#A32424');
+    html += svgProfile(lastCptResults, r=>r.qc1ncs, '(qc1N)cs vs depth', 220,260,'#A32424');
+    html += svgProfile(lastCptResults, r=>r.csr, 'CSR vs depth (CPT)', 220,260,'#A32424');
+  }
+  pd.innerHTML = html;
+}
+
+/* ============================================================
+   METHODOLOGY TABLE
+   ============================================================ */
+function renderMethodologyTable(cnMethod, rdMethod, msfMethod){
+  const rows = [
+    ['Total / effective vertical stress','Cumulative layer summation; u = γw(z−zw)','—'],
+    ['SPT overburden correction C_N', cnMethod==='10'?'C_N = 2.2/(1.2+σ\'v/Pa), capped 1.7':'C_N = (Pa/σ\'v)^0.5, capped 1.7', cnMethod==='10'?'Eq. 10':'Eq. 9'],
+    ['SPT energy correction C_E','C_E = ER/60','Table 2'],
+    ['SPT borehole dia. C_B','1.0 / 1.05 / 1.15 by diameter','Table 2'],
+    ['SPT rod length C_R','0.75–1.0 by rod length','Table 2'],
+    ['SPT sampler C_S','1.0 (standard) / 1.2 (no liner, midpoint)','Table 2'],
+    ['(N1)60','Nm·C_N·C_E·C_B·C_R·C_S','Eq. 8'],
+    ['Fines correction (N1)60cs','α + β(N1)60, α/β by FC','Eq. 5–7'],
+    ['SPT clean-sand CRR7.5','Rauch approximation, valid (N1)60cs<30','Eq. 4'],
+    ['Stress reduction r_d', rdMethod==='2'?'Liao & Whitman piecewise':'Blake continuous approximation', rdMethod==='2'?'Eq. 2a/2b':'Eq. 3'],
+    ['CSR','0.65(amax/g)(σv/σ\'v)r_d','Eq. 1'],
+    ['CPT normalized resistance Q, F','Q=[(qc−σv)/Pa](Pa/σ\'v)^n; F=[fs/(qc−σv)]×100%','Eq. 15–16'],
+    ['CPT soil behavior index Ic','[(3.47−logQ)²+(1.22+logF)²]^0.5, iterative n','Eq. 14, Robertson & Wride procedure'],
+    ['CPT normalization C_Q, qc1N','C_Q=(Pa/σ\'v)^n capped 1.7; qc1N=C_Q(qc/Pa)','Eq. 12–13'],
+    ['CPT clean-sand correction K_c','Polynomial in Ic, =1.0 for Ic≤1.64','Eq. 19'],
+    ['CPT clean-sand CRR7.5','Robertson & Wride equation, valid (qc1N)cs<160','Eq. 11'],
+    ['Magnitude scaling factor', msfMethod==='24'?'MSF = 10^2.24 / Mw^2.56 (Idriss revised)':'Seed & Idriss (1982), interpolated', msfMethod==='24'?'Eq. 24':'Table 3 col. 2'],
+    ['Factor of safety','FS = (CRR7.5/CSR)·MSF','Eq. 23'],
+  ];
+  document.getElementById('methodology-table').innerHTML = rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td class="mono">${r[2]}</td></tr>`).join('');
+}
+renderMethodologyTable('9','3','24');
+
+/* ============================================================
+   EXPORT RESULTS
+   ============================================================ */
+function exportCSVResults(kind){
+  if(kind==='spt'){
+    if(!lastSptResults.length){ alert('Run the analysis first.'); return; }
+    const headers = ['Borehole','Depth_m','N','sigmaV_kPa','sigmaVeff_kPa','CN','CE','CB','CR','CS','N160','FC_pct','N160cs','rd','CSR','CRR7.5','MSF','FS','Status'];
+    const csv = tableToCSV(lastSptResults, headers, r=>[r.bh,r.depth,r.n,fmt(r._sigmaV,2),fmt(r._sigmaVeff,2),fmt(r.cn.value,3),fmt(r.ce,3),fmt(r.cb,2),fmt(r.cr,2),fmt(r.cs,2),fmt(r.n160,3),r.fc,fmt(r.fines.N160cs,3),fmt(r.rd,4),fmt(r.csr,4),r.crrObj.tooDense?'':fmt(r.crrObj.crr,4),fmt(r.msf,3),r.fs===null?'':fmt(r.fs,3),`"${r.status}"`]);
+    downloadText('spt_liquefaction_results.csv', csv);
+  } else {
+    if(!lastCptResults.length){ alert('Run the analysis first.'); return; }
+    const headers = ['Sounding','Depth_m','qc_MPa','fs_kPa','sigmaV_kPa','sigmaVeff_kPa','Q','F','Ic','n','CQ','qc1N','Kc','qc1Ncs','rd','CSR','CRR7.5','MSF','FS','Status'];
+    const csv = tableToCSV(lastCptResults, headers, r=>[r.cid,r.depth,r.qc,r.fs,fmt(r._sigmaV,2),fmt(r._sigmaVeff,2),fmt(r.idx.Q,3),fmt(r.idx.F,3),fmt(r.idx.Ic,3),r.idx.n,fmt(r.cq.value,3),fmt(r.qc1n,3),fmt(r.kc,3),fmt(r.qc1ncs,3),fmt(r.rd,4),fmt(r.csr,4),(r.crrObj&&!r.crrObj.tooDense)?fmt(r.crrObj.crr,4):'',fmt(r.msf,3),r.fs===null?'':fmt(r.fs,3),`"${r.status}"`]);
+    downloadText('cpt_liquefaction_results.csv', csv);
+  }
+}
+
+/* init with example rows */
+loadSptExample();
+loadCptExample();
+</script>
+</body>
+</html>
